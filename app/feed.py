@@ -47,7 +47,7 @@ class RSSResponse(Response):
                 headers[headername] = newheaders[headername]
         super().init_headers(headers)
 
-    def render(self, feed: FeedGenerator, itunes: bool = False) -> bytes:
+    def render(self, feed: FeedGenerator) -> bytes:
         return feed.rss_str(pretty=True)
 
 
@@ -59,7 +59,7 @@ class AtomResponse(RSSResponse):
     media_type = 'application/xml'
     charset = 'utf-8'
 
-    def render(self, feed: FeedGenerator, itunes: bool = False) -> bytes:
+    def render(self, feed: FeedGenerator) -> bytes:
         return feed.atom_str(pretty=True)
 
 
@@ -103,23 +103,29 @@ async def _pocket_api_to_feed(articles: dict[str, object], request_url: URL, tit
 
 
 @cache(expire=settings.cache.pocket_list_expiration)
-async def retrieve_feed(request_url: URL, request_token: str, tag: Optional[str] = None,
-                        get_full_content: bool = False) -> FeedGenerator:
+async def _get_pocket_list(request_token: str, tag: Optional[str] = None) -> dict:
     pocket = common.get_pocket_instance(request_token)
     if pocket is None:
         raise "Invalid request token."
 
     if tag is not None:
-        articles = pocket.retrieve(state='unread', sort='newest', tag=tag)
+        return pocket.retrieve(state='unread', sort='newest', tag=tag)
+
+    return pocket.retrieve(state='unread', sort='newest')
+
+
+async def retrieve_feed(request_url: URL, request_token: str, tag: Optional[str] = None,
+                        get_full_content: bool = False) -> FeedGenerator:
+
+    if tag is not None:
         title_part = f'Unread items tagged {tag}' if tag != '_untagged_' else 'Unread and untagged items'
     else:
-        articles = pocket.retrieve(state='unread', sort='newest')
         title_part = 'Unread items'
 
     return await _pocket_api_to_feed(
         request_url=request_url,
         title_part=title_part,
-        articles=articles,
+        articles=(await _get_pocket_list(request_token=request_token, tag=tag)),
         request_token=request_token,
         get_full_content=get_full_content
     )
