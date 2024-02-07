@@ -6,7 +6,8 @@ from app.routers import atom
 from app.routers import read
 from app.settings import settings
 
-app = FastAPI()
+app = FastAPI(debug=settings.debug)
+
 app.include_router(rss.router)
 app.include_router(atom.router)
 app.include_router(read.router)

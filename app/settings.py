@@ -11,6 +11,7 @@ class Cache(BaseModel):
 
 
 class Settings(BaseSettings):
+    debug: bool = False
     pocket_consumer_key: str
     user_tokens: dict[str, str] = {}
     cache: Cache = Cache()
