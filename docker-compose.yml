@@ -1,0 +1,16 @@
+version: '3'
+name: pocket-bridge
+services:
+  app:
+    build:
+      context: .
+      secrets:
+        - AUTH_TOKEN
+    platform: linux/amd64
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+secrets:
+  AUTH_TOKEN:
+    file: ./.secrets/AUTH_TOKEN.txt

@@ -1,0 +1,14 @@
+{
+	"configurations": [
+		{
+			"type": "fastapi",
+			"name": "Application",
+			"module": "app.main",
+			"application": "app",
+			"arguments": [
+				"--reload"
+			]
+		},
+		
+	]
+}

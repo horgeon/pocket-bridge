@@ -1,0 +1,33 @@
+[project]
+name = "pocket-bridge"
+description = "A bridge application that exposes Pocket through other APIs."
+version = "1.0.0"
+authors = [{name = "Horgeon", email = "me@horgeon.fr"}]
+
+readme = "README.md"
+license = {file = "LICENSE"}
+
+requires-python = ">= 3.11"
+dependencies = [
+  "fastapi==0.109.2",
+  "pydantic-settings==2.1.0",
+  "python-dotenv==1.0.1",
+  "fastapi-cache2==0.2.1",
+  "fastapi-cache2[redis]==0.2.1",
+  "pocket-api==0.1.5",
+  "feedgen==1.0.0",
+  "readability-lxml==0.8.1",
+  "requests==2.31.0",
+  "redis==4.6.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "uvicorn"
+]
+
+[project.scripts]
+app = "app:main"
+
+[tool.setuptools]
+packages = ["app"]

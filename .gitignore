@@ -1,0 +1,31 @@
+# Linux
+*~
+*.swp
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Mac OS X
+.DS_Store
+._*
+
+# Local environement and secrets
+.env
+.secrets
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environement
+venv/
+
+# Build files
+build/
+*.egg-info/

@@ -1,0 +1,35 @@
+{
+    "listeners": {
+        "*:80": {
+            "pass": "routes"
+        }
+    },
+    "routes": [
+        {
+            "action": {
+                "share": "/app$uri",
+                "fallback": {
+                    "pass": "applications/fastapi"
+                }
+            }
+        }
+    ],
+    "applications": {
+        "fastapi": {
+            "type": "python 3.11",
+            "path": "/app/",
+            "home": "/app/venv/",
+            "module": "app.main",
+            "callable": "app"
+        }
+    },
+    "settings": {
+        "http": {
+            "header_read_timeout": 10,
+            "body_read_timeout": 10,
+            "send_timeout": 10,
+            "idle_timeout": 120,
+            "max_body_size": 6291456
+        }
+    }
+}
