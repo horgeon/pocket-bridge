@@ -64,7 +64,7 @@ class AtomResponse(RSSResponse):
 
 
 async def _pocket_api_to_feed(articles: dict[str, object], request_url: URL, title_part: str, request_token: str,
-                              get_full_content: bool = False) -> FeedGenerator:
+                              use_reader_url: bool = False, get_full_content: bool = False) -> FeedGenerator:
     feed = FeedGenerator()
 
     feed.id(str(request_url))
@@ -77,6 +77,7 @@ async def _pocket_api_to_feed(articles: dict[str, object], request_url: URL, tit
     for article_id, article in articles['list'].items():
         title = article['resolved_title'] if len(article['resolved_title']) else article['given_title']
         url = article['resolved_url'] if len(article['resolved_url']) > 0 else article['given_url']
+
         reader_url = str(reader.get_html_url(base_url=base_url, article_url=article['resolved_url'],
                                              request_token=request_token))
 
@@ -84,7 +85,7 @@ async def _pocket_api_to_feed(articles: dict[str, object], request_url: URL, tit
         entry.guid(article_id)
         entry.id(url)
         entry.title(title)
-        entry.link(href=reader_url)
+        entry.link(href=reader_url if use_reader_url else url)
         entry.updated(datetime.fromtimestamp(int(article['time_updated']), timezone.utc))
         entry.published(datetime.fromtimestamp(int(article['time_added']), timezone.utc))
 
@@ -117,7 +118,7 @@ async def _get_pocket_list(request_token: str, tag: Optional[str] = None) -> dic
 
 
 async def retrieve_feed(request_url: URL, request_token: str, tag: Optional[str] = None,
-                        get_full_content: bool = False) -> FeedGenerator:
+                        use_reader_url: bool = False, get_full_content: bool = False) -> FeedGenerator:
 
     if tag is not None:
         title_part = f'Unread items tagged {tag}' if tag != '_untagged_' else 'Unread and untagged items'
@@ -129,5 +130,6 @@ async def retrieve_feed(request_url: URL, request_token: str, tag: Optional[str]
         title_part=title_part,
         articles=(await _get_pocket_list(request_token=request_token, tag=tag)),
         request_token=request_token,
-        get_full_content=get_full_content
+        get_full_content=get_full_content,
+        use_reader_url=use_reader_url
     )
