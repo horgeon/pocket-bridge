@@ -2,7 +2,7 @@ import hashlib
 from typing import Mapping, Optional
 
 from fastapi_cache.decorator import cache
-from requests import HTTPError
+from requests import HTTPError, ConnectionError
 from starlette.datastructures import URL
 from starlette.responses import Response
 
@@ -94,7 +94,7 @@ async def _pocket_api_to_feed(articles: dict[str, object], request_url: URL, tit
         if get_full_content:
             try:
                 entry.description((await reader.get_html_content(url=url)), isSummary=False)
-            except HTTPError as e:
+            except (HTTPError, ConnectionError) as e:
                 entry.description(f'<p>{e.strerror}</p>', isSummary=False)
         else:
             entry.description(summary, isSummary=True)
