@@ -75,22 +75,24 @@ async def _pocket_api_to_feed(articles: dict[str, object], request_url: URL, tit
     base_url = get_base_url(request_url)
 
     for article_id, article in articles['list'].items():
+        title = article['resolved_title'] if len(article['resolved_title']) else article['given_title']
+        url = article['resolved_url'] if len(article['resolved_url']) > 0 else article['given_url']
         reader_url = str(reader.get_html_url(base_url=base_url, article_url=article['resolved_url'],
                                              request_token=request_token))
 
         entry = feed.add_entry()
         entry.guid(article_id)
-        entry.id(article['resolved_url'])
-        entry.title(article['resolved_title'])
+        entry.id(url)
+        entry.title(title)
         entry.link(href=reader_url)
         entry.updated(datetime.fromtimestamp(int(article['time_updated']), timezone.utc))
         entry.published(datetime.fromtimestamp(int(article['time_added']), timezone.utc))
 
-        summary = article['excerpt'] if 'excerpt' in article else article['resolved_title']
+        summary = article['excerpt'] if 'excerpt' in article else title
         entry.summary(summary)
         if get_full_content:
             try:
-                entry.description((await reader.get_html_content(url=article['resolved_url'])), isSummary=False)
+                entry.description((await reader.get_html_content(url=url)), isSummary=False)
             except HTTPError as e:
                 entry.description(f'<p>{e.strerror}</p>', isSummary=False)
         else:
