@@ -74,6 +74,9 @@ async def _pocket_api_to_feed(articles: dict[str, object], request_url: URL, tit
 
     base_url = get_base_url(request_url)
 
+    if len(articles['list']) == 0:
+        return feed
+
     for article_id, article in articles['list'].items():
         title = article['resolved_title'] if len(article['resolved_title']) else article['given_title']
         url = article['resolved_url'] if len(article['resolved_url']) > 0 else article['given_url']
